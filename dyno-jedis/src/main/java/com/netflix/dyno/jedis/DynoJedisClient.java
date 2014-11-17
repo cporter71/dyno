@@ -2140,9 +2140,9 @@ public class DynoJedisClient implements JedisCommands, MultiKeyCommands {
 				cpConfig = new ArchaiusConnectionPoolConfiguration(appName);
 			}
 			
-			if (port != -1) {
-				cpConfig.setPort(port);
-			}
+//			if (port != -1) {
+//				cpConfig.setPort(port);
+//			}
 			
 			if (hostSupplier == null) {
 				if(discoveryClient == null){

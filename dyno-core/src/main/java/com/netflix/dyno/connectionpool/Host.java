@@ -100,7 +100,7 @@ public class Host {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((socketAddress == null) ? 0 : socketAddress.hashCode());
 		result = prime * result + ((rack == null) ? 0 : rack.hashCode());
 		return result;
 	}
@@ -115,7 +115,7 @@ public class Host {
 		Host other = (Host) obj;
 		boolean equals = true;
 		
-		equals &= (name != null) ? name.equals(other.name) : other.name == null;
+		equals &= (socketAddress != null) ? socketAddress.equals(other.socketAddress) : other.socketAddress == null;
 		equals &= (rack != null) ? rack.equals(other.rack) : other.rack == null;
 		
 		return equals;

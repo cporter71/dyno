@@ -66,6 +66,7 @@ import com.netflix.dyno.connectionpool.exception.DynoConnectException;
 import com.netflix.dyno.connectionpool.exception.DynoException;
 import com.netflix.dyno.connectionpool.exception.FatalConnectionException;
 import com.netflix.dyno.connectionpool.exception.NoAvailableHostsException;
+import com.netflix.dyno.connectionpool.exception.PoolOfflineException;
 import com.netflix.dyno.connectionpool.exception.PoolTimeoutException;
 import com.netflix.dyno.connectionpool.exception.ThrottledException;
 import com.netflix.dyno.connectionpool.impl.ConnectionPoolConfigurationImpl.ErrorRateMonitorConfigImpl;
@@ -169,8 +170,6 @@ public class ConnectionPoolImpl<CL> implements ConnectionPool<CL> {
 
 	public boolean addHost(Host host, boolean refreshLoadBalancer) {
 		
-		host.setPort(cpConfiguration.getPort());
-
 		HostConnectionPool<CL> connPool = cpMap.get(host);
 		
 		if (connPool != null) {
@@ -281,6 +280,7 @@ public class ConnectionPoolImpl<CL> implements ConnectionPool<CL> {
 		return cpMap.get(host);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <R> OperationResult<R> executeWithFailover(Operation<CL, R> op) throws DynoException {
 		
@@ -327,6 +327,10 @@ public class ConnectionPoolImpl<CL> implements ConnectionPool<CL> {
 				// Track the connection health so that the pool can be purged at a later point
 				if (connection != null) {
 					cpHealthTracker.trackConnectionError(connection.getParentConnectionPool(), lastException);
+				} else if (e instanceof PoolOfflineException) {
+					PoolOfflineException poe = (PoolOfflineException) e;
+					HostConnectionPool<?> hostPool = poe.getHostPool();
+					cpHealthTracker.reconnectPool((HostConnectionPool<CL>)hostPool);
 				}
 				
 			} catch(Throwable t) {
@@ -343,6 +347,7 @@ public class ConnectionPoolImpl<CL> implements ConnectionPool<CL> {
 		throw lastException;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <R> Collection<OperationResult<R>> executeWithRing(Operation<CL, R> op) throws DynoException {
 
@@ -393,6 +398,10 @@ public class ConnectionPoolImpl<CL> implements ConnectionPool<CL> {
 						// Track the connection health so that the pool can be purged at a later point
 						if (connection != null) {
 							cpHealthTracker.trackConnectionError(connection.getParentConnectionPool(), lastException);
+						} else if (e instanceof PoolOfflineException) {
+							PoolOfflineException poe = (PoolOfflineException) e;
+							HostConnectionPool<?> hostPool = poe.getHostPool();
+							cpHealthTracker.trackConnectionError((HostConnectionPool<CL>)hostPool, lastException);
 						}
 
 					} catch(Throwable t) {
@@ -461,7 +470,11 @@ public class ConnectionPoolImpl<CL> implements ConnectionPool<CL> {
 		Collection<Host> hostsUp = hostStatus.getActiveHosts();
 		
 		if (hostsUp == null || hostsUp.isEmpty()) {
-			throw new NoAvailableHostsException("No available hosts when starting connection pool");
+			if (hostStatus.getInactiveHosts() == null || hostStatus.getInactiveHosts().isEmpty()) {
+				throw new NoAvailableHostsException("No available hosts when starting connection pool");
+			} else {
+				Logger.warn("No available hosts when starting connection pool - hosts will be monitored for transition to available");
+			}
 		}
 
 		for (Host host : hostsUp) {

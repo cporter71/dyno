@@ -45,7 +45,7 @@ public class ConnectionPoolConfigurationImpl implements ConnectionPoolConfigurat
 	private TokenMapSupplier tokenSupplier;
 
 	private final String name;
-	private int port = DEFAULT_PORT; 
+//	private int port = DEFAULT_PORT; 
 	private int maxConnsPerHost = DEFAULT_MAX_CONNS_PER_HOST; 
 	private int maxTimeoutWhenExhausted = DEFAULT_MAX_TIMEOUT_WHEN_EXHAUSTED; 
 	private int maxFailoverCount = DEFAULT_MAX_FAILOVER_COUNT; 
@@ -77,10 +77,10 @@ public class ConnectionPoolConfigurationImpl implements ConnectionPoolConfigurat
 		return name;
 	}
 
-	@Override
-	public int getPort() {
-		return port;
-	}
+//	@Override
+//	public int getPort() {
+//		return port;
+//	}
 
 	@Override
 	public int getMaxConnsPerHost() {
@@ -97,10 +97,10 @@ public class ConnectionPoolConfigurationImpl implements ConnectionPoolConfigurat
 		return maxFailoverCount;
 	}
 
-	public ConnectionPoolConfigurationImpl setPort(int port) {
-		this.port = port;
-		return this;
-	}
+//	public ConnectionPoolConfigurationImpl setPort(int port) {
+//		this.port = port;
+//		return this;
+//	}
 
 	@Override
 	public int getConnectTimeout() {

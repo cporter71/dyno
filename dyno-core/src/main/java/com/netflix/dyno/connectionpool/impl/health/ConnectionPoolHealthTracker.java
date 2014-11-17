@@ -192,7 +192,7 @@ public class ConnectionPoolHealthTracker<CL> {
 		Host host = hostPool.getHost();
 		Logger.error("Enqueueing host cp for recycling due to too many errors: " + hostPool);
 		hostPool.markAsDown(null);
-		reconnectingPools.put(host, hostPool);
+		reconnectingPools.putIfAbsent(host, hostPool);
 	}
 	
 	public void initialPingHealthchecksForPool(HostConnectionPool<CL> hostPool) {

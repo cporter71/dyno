@@ -149,7 +149,7 @@ public class HostSelectionWithFallback<CL> {
 				if (lastEx != null) {
 					throw lastEx; // give up
 				} else {
-					throw new PoolOfflineException(hostPool.getHost(), "host pool is offline and no DCs available for fallback");
+					throw new PoolOfflineException(hostPool, "host pool is offline and no DCs available for fallback");
 				}
 			} else {
 				hostPool = getFallbackHostPool(op, token);
@@ -303,8 +303,10 @@ public class HostSelectionWithFallback<CL> {
 		// Update inner state with the host tokens.
 		
 		for (HostToken hToken : allHostTokens) {
-			hostTokens.put(hToken.getHost(), hToken);
-			tokenPoolMap.put(hToken, hPools.get(hToken.getHost()));
+			Host host = hToken.getHost();
+			hostTokens.put(host, hToken);
+			HostConnectionPool<CL> value = hPools.get(host);
+			tokenPoolMap.put(hToken, value);
 		}
 		
 		Set<String> remoteDCs = new HashSet<String>();

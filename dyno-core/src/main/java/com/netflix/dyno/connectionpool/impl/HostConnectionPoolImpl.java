@@ -192,7 +192,7 @@ public class HostConnectionPoolImpl<CL> implements HostConnectionPool<CL> {
 		int successfullyCreated = 0; 
 		
 		for (int i=0; i<cpConfig.getMaxConnsPerHost(); i++) {
-			boolean success = createConnectionWithReries(); 
+			boolean success = createConnectionWithRetries(); 
 			if (success) {
 				successfullyCreated++;
 			}
@@ -210,7 +210,7 @@ public class HostConnectionPoolImpl<CL> implements HostConnectionPool<CL> {
 		return successfullyCreated;
 	}
 	
-	private boolean createConnectionWithReries() {
+	private boolean createConnectionWithRetries() {
 		
 		boolean success = false;
 		RetryPolicy retry = new RetryNTimes.RetryFactory(3).getRetryPolicy();
@@ -237,6 +237,10 @@ public class HostConnectionPoolImpl<CL> implements HostConnectionPool<CL> {
 		return host;
 	}
 
+	public HostConnectionPool<CL> getHostConnectionPool() {
+		return this;
+	}
+	
 	@Override
 	public boolean isActive() {
 		return cpState.get() == cpActive;
@@ -383,12 +387,12 @@ public class HostConnectionPoolImpl<CL> implements HostConnectionPool<CL> {
 
 		@Override
 		public Connection<CL> createConnection() {
-			throw new PoolOfflineException(getHost(), "Cannot create new connection when pool is down");
+			throw new PoolOfflineException(getHostConnectionPool(), "Cannot create new connection when pool is down");
 		}
 
 		@Override
 		public Connection<CL> borrowConnection(int duration, TimeUnit unit) {
-			throw new PoolOfflineException(getHost(), "Cannot borrow connection when pool is down");
+			throw new PoolOfflineException(getHostConnectionPool(), "Cannot borrow connection when pool is down");
 		}
 
 		@Override

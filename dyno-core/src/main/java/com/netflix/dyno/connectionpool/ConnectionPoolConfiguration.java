@@ -30,11 +30,11 @@ public interface ConnectionPoolConfiguration {
      */
     public String getName();
 
-    /**
-     * @return Data port to be used when no port is specified to a list of seeds or when
-     * doing a ring describe since the ring describe does not include a host
-     */
-    public int getPort();
+//    /**
+//     * @return Data port to be used when no port is specified to a list of seeds or when
+//     * doing a ring describe since the ring describe does not include a host
+//     */
+//    public int getPort();
 
     /**
      * @return Maximum number of connections to allocate for a single host's pool

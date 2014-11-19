@@ -456,10 +456,6 @@ public class ConnectionPoolImpl<CL> implements ConnectionPool<CL> {
 		connPoolThreadPool.shutdownNow();
 	}
 
-	public HostSupplier getHostSupplier() {
-		return cpConfiguration.getHostSupplier();
-	}
-	
 	@Override
 	public Future<Boolean> start() throws DynoException {
 		

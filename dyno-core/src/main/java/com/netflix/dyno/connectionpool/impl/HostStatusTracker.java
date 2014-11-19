@@ -124,7 +124,11 @@ public class HostStatusTracker {
 	 * @return true/false indicating whether the set of hosts has changed or not.
 	 */
 	public boolean checkIfChanged(Collection<Host> hostsUp, Collection<Host> hostsDown) {
-		return activeSetChanged(hostsUp) || inactiveSetChanged(hostsUp, hostsDown);
+		if (hostsUp.size() != activeHosts.size() || hostsDown.size() != inactiveHosts.size()) {
+			return true;
+		} else {
+			return activeSetChanged(hostsUp) || inactiveSetChanged(hostsUp, hostsDown);
+		}
 	}
 	
 	/**

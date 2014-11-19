@@ -39,12 +39,6 @@ public interface ConnectionPool<CL> {
      */
     public boolean addHost(Host host);
 
-    /**
-     * 
-     * @return
-     */
-    public HostSupplier getHostSupplier();
-    
 	/**
      * Remove a host from the connection pool.
      * 

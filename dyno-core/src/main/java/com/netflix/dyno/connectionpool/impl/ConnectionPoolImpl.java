@@ -18,8 +18,10 @@ package com.netflix.dyno.connectionpool.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -454,6 +456,10 @@ public class ConnectionPoolImpl<CL> implements ConnectionPool<CL> {
 		connPoolThreadPool.shutdownNow();
 	}
 
+	public HostSupplier getHostSupplier() {
+		return cpConfiguration.getHostSupplier();
+	}
+	
 	@Override
 	public Future<Boolean> start() throws DynoException {
 		

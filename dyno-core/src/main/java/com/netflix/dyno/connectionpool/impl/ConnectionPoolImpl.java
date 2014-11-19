@@ -504,6 +504,11 @@ public class ConnectionPoolImpl<CL> implements ConnectionPool<CL> {
 		return getEmptyFutureTask(true);
 	}
 	
+	public HostSupplier getHostSupplier() {
+		HostSupplier hostSupplier = cpConfiguration.getHostSupplier();
+		return hostSupplier;
+	}
+	
 	private HostSelectionWithFallback<CL> initSelectionStrategy() {
 		
 		if (cpConfiguration.getTokenSupplier() == null) {

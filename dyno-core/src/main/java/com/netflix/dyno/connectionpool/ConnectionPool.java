@@ -125,4 +125,10 @@ public interface ConnectionPool<CL> {
      * Setup the connection pool and start any maintenance threads
      */
     public Future<Boolean> start();
+    
+    /**
+     * 
+     * @return
+     */
+    public HostSupplier getHostSupplier();
 }

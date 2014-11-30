@@ -30,12 +30,11 @@ import com.netflix.dyno.connectionpool.impl.health.SimpleErrorMonitorImpl.Simple
 public class ConnectionPoolConfigurationImpl implements ConnectionPoolConfiguration {
 	
 	// DEFAULTS 
-	private static final int DEFAULT_PORT = 8102; 
 	private static final int DEFAULT_MAX_CONNS_PER_HOST = 1; 
 	private static final int DEFAULT_MAX_TIMEOUT_WHEN_EXHAUSTED = 2000; 
 	private static final int DEFAULT_MAX_FAILOVER_COUNT = 3; 
 	private static final int DEFAULT_CONNECT_TIMEOUT = 3000; 
-	private static final int DEFAULT_SOCKET_TIMEOUT = 12000; 
+//	private static final int DEFAULT_SOCKET_TIMEOUT = 12000; 
 	private static final int DEFAULT_POOL_SHUTDOWN_DELAY = 60000; 
 	private static final int DEFAULT_PING_FREQ_SECONDS = 1; 
 	private static final boolean DEFAULT_LOCAL_DC_AFFINITY = true; 
@@ -45,12 +44,11 @@ public class ConnectionPoolConfigurationImpl implements ConnectionPoolConfigurat
 	private TokenMapSupplier tokenSupplier;
 
 	private final String name;
-//	private int port = DEFAULT_PORT; 
 	private int maxConnsPerHost = DEFAULT_MAX_CONNS_PER_HOST; 
 	private int maxTimeoutWhenExhausted = DEFAULT_MAX_TIMEOUT_WHEN_EXHAUSTED; 
 	private int maxFailoverCount = DEFAULT_MAX_FAILOVER_COUNT; 
 	private int connectTimeout = DEFAULT_CONNECT_TIMEOUT; 
-	private int socketTimeout = DEFAULT_SOCKET_TIMEOUT; 
+//	private int socketTimeout = DEFAULT_SOCKET_TIMEOUT; 
 	private int poolShutdownDelay = DEFAULT_POOL_SHUTDOWN_DELAY; 
 	private int pingFrequencySeconds = DEFAULT_PING_FREQ_SECONDS; 
 	private boolean localDcAffinity = DEFAULT_LOCAL_DC_AFFINITY; 
@@ -77,11 +75,6 @@ public class ConnectionPoolConfigurationImpl implements ConnectionPoolConfigurat
 		return name;
 	}
 
-//	@Override
-//	public int getPort() {
-//		return port;
-//	}
-
 	@Override
 	public int getMaxConnsPerHost() {
 		return maxConnsPerHost;
@@ -97,20 +90,15 @@ public class ConnectionPoolConfigurationImpl implements ConnectionPoolConfigurat
 		return maxFailoverCount;
 	}
 
-//	public ConnectionPoolConfigurationImpl setPort(int port) {
-//		this.port = port;
-//		return this;
-//	}
-
 	@Override
 	public int getConnectTimeout() {
 		return connectTimeout;
 	}
-
-	@Override
-	public int getSocketTimeout() {
-		return socketTimeout;
-	}
+//
+//	@Override
+//	public int getSocketTimeout() {
+//		return socketTimeout;
+//	}
 
 	@Override
 	public RetryPolicyFactory getRetryPolicyFactory() {
@@ -163,10 +151,10 @@ public class ConnectionPoolConfigurationImpl implements ConnectionPoolConfigurat
 		return this;
 	}
 
-	public ConnectionPoolConfigurationImpl setSocketTimeout(int socketTimeout) {
-		this.socketTimeout = socketTimeout;
-		return this;
-	}
+//	public ConnectionPoolConfigurationImpl setSocketTimeout(int socketTimeout) {
+//		this.socketTimeout = socketTimeout;
+//		return this;
+//	}
 
 	public ConnectionPoolConfigurationImpl setLoadBalancingStrategy(LoadBalancingStrategy strategy) {
 		this.lbStrategy = strategy;

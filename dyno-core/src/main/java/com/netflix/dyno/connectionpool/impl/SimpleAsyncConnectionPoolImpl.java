@@ -62,6 +62,11 @@ public class SimpleAsyncConnectionPoolImpl<CL> implements HostConnectionPool<CL>
 	}
 	
 	@Override
+	public ConnectionPoolConfiguration getConnectionPoolConfiguration() {
+		return cpConfig;
+	}
+	
+	@Override
 	public Connection<CL> borrowConnection(int duration, TimeUnit unit) throws DynoException {
 		
 		if (!active.get()) {

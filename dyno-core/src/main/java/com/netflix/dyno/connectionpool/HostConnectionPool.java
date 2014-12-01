@@ -52,6 +52,13 @@ import com.netflix.dyno.connectionpool.exception.DynoException;
  */
 public interface HostConnectionPool<CL> {
 	
+	/**
+	 * Pool configuration.
+	 *  
+	 * @return
+	 */
+	public ConnectionPoolConfiguration getConnectionPoolConfiguration();
+	
     /**
      * Borrow a connection from the host. May create a new connection if one is
      * not available.

@@ -592,6 +592,18 @@ public class DynoJedisPipeline implements RedisPipeline {
 	    return jedisPipeline.bitcount(key, start, end);
 	}
 
+	@Override
+	public Response<Long> pfadd(String key, String... elements) {
+	    checkKey(key);
+		return jedisPipeline.pfadd(key, elements);
+	}
+
+	@Override
+	public Response<Long> pfcount(String key) {
+	    checkKey(key);
+		return jedisPipeline.pfcount(key);
+	}
+	
 	public void sync() {
 		try {
 			jedisPipeline.sync();

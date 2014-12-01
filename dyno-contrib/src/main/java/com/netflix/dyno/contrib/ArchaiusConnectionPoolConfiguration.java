@@ -24,7 +24,7 @@ public class ArchaiusConnectionPoolConfiguration extends ConnectionPoolConfigura
 	private final DynamicIntProperty maxTimeoutWhenExhausted;
 	private final DynamicIntProperty maxFailoverCount;
 	private final DynamicIntProperty connectTimeout;
-//	private final DynamicIntProperty socketTimeout;
+	private final DynamicIntProperty socketTimeout;
 	private final DynamicIntProperty poolShutdownDelay;
 	private final DynamicBooleanProperty localDcAffinity;
 	
@@ -41,7 +41,7 @@ public class ArchaiusConnectionPoolConfiguration extends ConnectionPoolConfigura
 		maxTimeoutWhenExhausted = DynamicPropertyFactory.getInstance().getIntProperty(propertyPrefix + ".connection.maxTimeoutWhenExhausted", super.getMaxTimeoutWhenExhausted());
 		maxFailoverCount = DynamicPropertyFactory.getInstance().getIntProperty(propertyPrefix + ".connection.maxFailoverCount", super.getMaxFailoverCount());
 		connectTimeout = DynamicPropertyFactory.getInstance().getIntProperty(propertyPrefix + ".connection.connectTimeout", super.getConnectTimeout());
-//		socketTimeout = DynamicPropertyFactory.getInstance().getIntProperty(propertyPrefix + ".connection.socketTimeout", super.getSocketTimeout());
+		socketTimeout = DynamicPropertyFactory.getInstance().getIntProperty(propertyPrefix + ".connection.socketTimeout", super.getSocketTimeout());
 		poolShutdownDelay = DynamicPropertyFactory.getInstance().getIntProperty(propertyPrefix + ".connection.poolShutdownDelay", super.getPoolShutdownDelay());
 		localDcAffinity = DynamicPropertyFactory.getInstance().getBooleanProperty(propertyPrefix + ".connection.localDcAffinity", super.localDcAffinity());
 
@@ -78,10 +78,10 @@ public class ArchaiusConnectionPoolConfiguration extends ConnectionPoolConfigura
 		return connectTimeout.get();
 	}
 
-//	@Override
-//	public int getSocketTimeout() {
-//		return socketTimeout.get();
-//	}
+	@Override
+	public int getSocketTimeout() {
+		return socketTimeout.get();
+	}
 
 	@Override
 	public RetryPolicyFactory getRetryPolicyFactory() {

@@ -48,10 +48,10 @@ public interface ConnectionPoolConfiguration {
      */
     public int getMaxFailoverCount();
 
-//    /**
-//     * @return Socket read/write timeout
-//     */
-//    public int getSocketTimeout();
+    /**
+     * @return Socket read/write timeout
+     */
+    public int getSocketTimeout();
 
     /**
      * @return LoadBalancingStrategy

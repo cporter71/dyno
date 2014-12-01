@@ -12,6 +12,7 @@ import com.netflix.dyno.connectionpool.Connection;
 import com.netflix.dyno.connectionpool.ConnectionContext;
 import com.netflix.dyno.connectionpool.ConnectionFactory;
 import com.netflix.dyno.connectionpool.ConnectionObservor;
+import com.netflix.dyno.connectionpool.ConnectionPoolConfiguration;
 import com.netflix.dyno.connectionpool.Host;
 import com.netflix.dyno.connectionpool.HostConnectionPool;
 import com.netflix.dyno.connectionpool.ListenableFuture;
@@ -50,12 +51,11 @@ public class JedisConnectionFactory implements ConnectionFactory<Jedis> {
 		public JedisConnection(HostConnectionPool<Jedis> hostPool) {
 			this.hostPool = hostPool;
 			Host host = hostPool.getHost();
+			ConnectionPoolConfiguration configuration = hostPool.getConnectionPoolConfiguration();
+			int connectTimeout = configuration.getConnectTimeout();
+			int socketTimeout = configuration.getSocketTimeout();
 
-			if (host.isTimeoutSet()) {
-				jedisClient = new Jedis(host.getHostName(), host.getPort(), host.getTimeout());
-			} else {
-				jedisClient = new Jedis(host.getHostName(), host.getPort());
-			}
+			jedisClient = new Jedis(host.getHostName(), host.getPort(), connectTimeout, socketTimeout);
 
 			// // TODO: Dynomite node should support AUTH
 			// if (host.isPasswordSet()) {

@@ -27,7 +27,6 @@ public class Host {
 
 	private final String name;
 	private int port;
-	private int timeout = Integer.MIN_VALUE;
 	private String password = null;
 	private Status status = Status.Down;
 	private InetSocketAddress socketAddress = null;
@@ -69,18 +68,6 @@ public class Host {
 		this.port = p;
 		this.socketAddress = new InetSocketAddress(name, port);
 		return this;
-	}
-
-	public boolean isTimeoutSet() {
-		return timeout != Integer.MIN_VALUE;
-	}
-
-	public int getTimeout() {
-		return timeout;
-	}
-
-	public void setTimeout(int timeout) {
-		this.timeout = timeout;
 	}
 
 	public boolean isPasswordSet() {
@@ -153,7 +140,6 @@ public class Host {
 
 	@Override
 	public String toString() {
-		return "Host [name=" + name + ", port=" + port + ", timeout=" + timeout + ", status=" + status + ", socketAddress=" + socketAddress + ", rack=" + rack
-				+ "]";
+		return "Host [name=" + name + ", port=" + port + ", status=" + status + ", socketAddress=" + socketAddress + ", rack=" + rack + "]";
 	}
 }

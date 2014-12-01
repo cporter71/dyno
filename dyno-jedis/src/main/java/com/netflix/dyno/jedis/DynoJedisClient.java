@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.NotImplementedException;
@@ -15,6 +16,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.MultiKeyCommands;
+import redis.clients.jedis.ScanResult;
 import redis.clients.jedis.SortingParams;
 import redis.clients.jedis.Tuple;
 import redis.clients.jedis.ZParams;
@@ -1005,6 +1007,22 @@ public class DynoJedisClient implements JedisCommands, MultiKeyCommands {
 	}
 
 	@Override
+	public String set(final String key, final String value, final String nxxx, final String expx, final long time) {
+		return d_set(key, value, nxxx, expx, time).getResult();
+	}
+
+	public OperationResult<String> d_set(final String key, final String value, final String nxxx, final String expx, final long time) {
+		return connPool.executeWithFailover(new BaseKeyOperation<String>(key, OpName.SET) {
+
+			@Override
+			public String execute(Jedis client, ConnectionContext state) {
+				return client.set(key, value, nxxx, expx, time);
+			}
+
+		});
+	}
+	
+	@Override
 	public Long setnx(final String key, final String value)  {
 	    return d_setnx(key, value).getResult();
 	}
@@ -1261,14 +1279,13 @@ public class DynoJedisClient implements JedisCommands, MultiKeyCommands {
 
 		});
 	}
-	
 
 	@Override
-	public Long zadd(String key, Map<Double, String> scoreMembers) {
+	public Long zadd(String key, Map<String, Double> scoreMembers) {
 		return d_zadd(key, scoreMembers).getResult();
 	}
-
-	public OperationResult<Long> d_zadd(final String key, final Map<Double, String> scoreMembers)  {
+	
+	public OperationResult<Long> d_zadd(final String key, final Map<String, Double> scoreMembers)  {
 
 		return connPool.executeWithFailover(new BaseKeyOperation<Long>(key, OpName.ZADD) {
 
@@ -2081,6 +2098,66 @@ public class DynoJedisClient implements JedisCommands, MultiKeyCommands {
 		throw new NotImplementedException("not yet implemented");
 	}
 
+	@Override
+	public ScanResult<Entry<String, String>> hscan(String key, int cursor) {
+		throw new NotImplementedException("not yet implemented");
+	}
+
+	@Override
+	public ScanResult<String> sscan(String key, int cursor) {
+		throw new NotImplementedException("not yet implemented");
+	}
+
+	@Override
+	public ScanResult<Tuple> zscan(String key, int cursor) {
+		throw new NotImplementedException("not yet implemented");
+	}
+
+	@Override
+	public ScanResult<Entry<String, String>> hscan(String key, String cursor) {
+		throw new NotImplementedException("not yet implemented");
+	}
+
+	@Override
+	public ScanResult<String> sscan(String key, String cursor) {
+		throw new NotImplementedException("not yet implemented");
+	}
+
+	@Override
+	public ScanResult<Tuple> zscan(String key, String cursor) {
+		throw new NotImplementedException("not yet implemented");
+	}
+
+	@Override
+	public Long pfadd(String key, String... elements) {
+		throw new NotImplementedException("not yet implemented");
+	}
+
+	@Override
+	public long pfcount(String key) {
+		throw new NotImplementedException("not yet implemented");
+	}
+
+	@Override
+	public ScanResult<String> scan(int cursor) {
+		throw new NotImplementedException("not yet implemented");
+	}
+
+	@Override
+	public ScanResult<String> scan(String cursor) {
+		throw new NotImplementedException("not yet implemented");
+	}
+
+	@Override
+	public String pfmerge(String destkey, String... sourcekeys) {
+		throw new NotImplementedException("not yet implemented");
+	}
+
+	@Override
+	public long pfcount(String... keys) {
+		throw new NotImplementedException("not yet implemented");
+	}
+	
 	public void stopClient() {
 		this.connPool.shutdown();
 	}
@@ -2139,10 +2216,6 @@ public class DynoJedisClient implements JedisCommands, MultiKeyCommands {
 			if (cpConfig == null) {
 				cpConfig = new ArchaiusConnectionPoolConfiguration(appName);
 			}
-			
-//			if (port != -1) {
-//				cpConfig.setPort(port);
-//			}
 			
 			if (hostSupplier == null) {
 				if(discoveryClient == null){

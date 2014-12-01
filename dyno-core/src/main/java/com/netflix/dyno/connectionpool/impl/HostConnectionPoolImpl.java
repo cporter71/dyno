@@ -110,6 +110,10 @@ public class HostConnectionPoolImpl<CL> implements HostConnectionPool<CL> {
 		this.monitor = poolMonitor;
 	}
 	
+	public ConnectionPoolConfiguration getConnectionPoolConfiguration() {
+		return cpConfig;
+	}
+	
 	@Override
 	public Connection<CL> borrowConnection(int duration, TimeUnit unit) throws DynoException {
 		return cpState.get().borrowConnection(duration, unit);

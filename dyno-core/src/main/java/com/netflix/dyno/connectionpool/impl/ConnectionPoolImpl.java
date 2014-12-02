@@ -18,10 +18,8 @@ package com.netflix.dyno.connectionpool.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -235,6 +233,14 @@ public class ConnectionPoolImpl<CL> implements ConnectionPool<CL> {
 		return (hostPool != null) ? hostPool.isActive() : false;
 	}
 
+	public Long getHostTokenForKey(String key) {
+		return selectionStrategy.getHostTokenForKey(key);
+	}
+
+	public boolean isPoolActiveForToken(Long token) {
+		return selectionStrategy.isPoolActiveForToken(token);
+	}
+	
 	@Override
 	public boolean hasHost(Host host) {
 		return cpMap.get(host) != null;

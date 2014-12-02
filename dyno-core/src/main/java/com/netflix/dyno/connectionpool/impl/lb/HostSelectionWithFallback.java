@@ -114,6 +114,26 @@ public class HostSelectionWithFallback<CL> {
 		return getConnection(op, null, duration, unit);
 	}
 
+	public Long getHostTokenForKey(String key) {
+		return localSelector.getHostTokenForKey(key);
+	}
+
+	public boolean isPoolActiveForToken(Long token) {
+		boolean poolActiveForKey = false;
+		if (token != null) {
+			poolActiveForKey = localSelector.isPoolActiveForToken(token);
+			if (!poolActiveForKey && cpConfig.getMaxFailoverCount() > 0) {
+				if (!remoteDCNames.getEntireList().isEmpty()) {
+					String remoteDC = remoteDCNames.getNextElement();
+					HostSelectionStrategy<CL> remoteDCSelector = remoteDCSelectors.get(remoteDC);
+					poolActiveForKey = remoteDCSelector.isPoolActiveForToken(token);
+				}
+			}
+		}
+
+		return poolActiveForKey;
+	}
+	
 	private Connection<CL> getConnection(BaseOperation<CL, ?> op, Long token, int duration, TimeUnit unit) throws NoAvailableHostsException, PoolExhaustedException {
 
 		HostConnectionPool<CL> hostPool = null; 
@@ -157,7 +177,7 @@ public class HostSelectionWithFallback<CL> {
 		}
 		
 		if (hostPool == null) {
-			throw new NoAvailableHostsException("Found no hosts when using fallback DC");
+			throw new NoAvailableHostsException("Found no hosts when using fallback DC", localSelector.getHostTokenForKey(op.getKey()));
 		}
 		
 		return hostPool.borrowConnection(duration, unit);
@@ -198,7 +218,7 @@ public class HostSelectionWithFallback<CL> {
 		if (lastEx != null) {
 			throw lastEx;
 		} else {
-			throw new NoAvailableHostsException("Local zone host offline and could not find any remote hosts for fallback connection");
+			throw new NoAvailableHostsException("Local zone host offline and could not find any remote hosts for fallback connection", localSelector.getHostTokenForKey(op.getKey()));
 		}
 	}
 

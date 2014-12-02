@@ -125,4 +125,18 @@ public interface ConnectionPool<CL> {
      * @return
      */
     public HostSupplier getHostSupplier();
+    
+    /**
+     * 
+     * @param key
+     * @return
+     */
+	public Long getHostTokenForKey(String key);
+
+	/**
+	 * 
+	 * @param token
+	 * @return
+	 */
+	public boolean isPoolActiveForToken(Long token);
 }

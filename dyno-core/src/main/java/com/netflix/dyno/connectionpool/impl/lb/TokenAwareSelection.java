@@ -144,6 +144,38 @@ public class TokenAwareSelection<CL> implements HostSelectionStrategy<CL> {
 		return keyHash;
 	}
 
+	public Long getHostTokenForKey(String key) {
+		
+		Long token = null;
+		if (key != null && !key.isEmpty()) {
+			Long keyHash = tokenMapper.hash(key);
+			HostToken hToken = tokenMapper.getToken(keyHash);
+			token = (hToken == null) ? null : hToken.getToken();
+		}
+
+		return token;
+	}
+		
+	public boolean isPoolActiveForToken(Long token) {
+
+		boolean isPoolActive = false;
+		if (token == null) {
+			HostToken hostToken = tokenMapper.getToken(token);
+			HostConnectionPool<CL> hostPool = null;
+			if (hostToken != null) {
+				hostPool = tokenPools.get(hostToken.getToken());
+			}
+
+			if (hostPool != null && hostPool.isActive()) {
+				Host host = hostPool.getHost();
+				if (host != null && host.isUp()) {
+					isPoolActive = true;
+				}
+			}
+		}
+
+		return isPoolActive;
+	}
 	
 	public String toString() {
 		return "TokenAwareSelection: " + tokenMapper.toString();

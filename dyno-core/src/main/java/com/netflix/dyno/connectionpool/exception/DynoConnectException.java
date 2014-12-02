@@ -10,6 +10,7 @@ public class DynoConnectException extends DynoException {
 
 	private Host host = Host.NO_HOST;
     
+	private long hostToken = Long.MIN_VALUE;
     private long latency = 0;
     private long latencyWithPool = 0;
     private int attemptCount = 0;
@@ -57,19 +58,18 @@ public class DynoConnectException extends DynoException {
         return this.latencyWithPool;
     }
 
-    @Override
-    public String getMessage() {
-        return new StringBuilder()
-            .append(getClass().getSimpleName())
-            .append(": [")
-            .append(  "host="    ).append(host.toString())
-            .append(", latency=" ).append(latency).append("(").append(latencyWithPool).append(")")
-            .append(", attempts=").append(attemptCount)
-            .append("]")
-            .append(super.getMessage())
-            .toString();
-    }
+	public long getHostToken() {
+		return hostToken;
+	}
 
+	public boolean isHostToken() {
+		return this.hostToken != Long.MIN_VALUE;
+	}
+	
+	public void setHostToken(long token) {
+		this.hostToken = token;
+	}
+	
     public String getOriginalMessage() {
         return super.getMessage();
     }
@@ -77,5 +77,19 @@ public class DynoConnectException extends DynoException {
     public DynoConnectException setAttempt(int attemptCount) {
         this.attemptCount = attemptCount;
         return this;
+    }
+    
+    @Override
+    public String getMessage() {
+        return new StringBuilder()
+            .append(getClass().getSimpleName())
+            .append(": [")
+            .append(  "host="    ).append(host.toString())
+            .append(  "token="    ).append(hostToken)
+            .append(", latency=" ).append(latency).append("(").append(latencyWithPool).append(")")
+            .append(", attempts=").append(attemptCount)
+            .append("]")
+            .append(super.getMessage())
+            .toString();
     }
 }

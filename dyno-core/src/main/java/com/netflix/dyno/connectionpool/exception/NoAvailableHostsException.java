@@ -6,4 +6,10 @@ public class NoAvailableHostsException extends DynoConnectException {
 		super(message);
 	}
 
+	public NoAvailableHostsException(String message, Long hostToken) {
+		super(message);
+		if (hostToken != null) {
+			setHostToken(hostToken);
+		}
+	}	
 }

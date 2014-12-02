@@ -92,7 +92,6 @@ public class RoundRobinSelection<CL> implements HostSelectionStrategy<CL> {
 		return new ArrayList<HostConnectionPool<CL>>(tokenPools.values());
 	}
 
-
 	@Override
 	public HostConnectionPool<CL> getPoolForToken(Long token) {
 		return tokenPools.get(token);
@@ -147,6 +146,16 @@ public class RoundRobinSelection<CL> implements HostSelectionStrategy<CL> {
 			tokenPools.remove(host.getToken());
 		}
 		return prevPool != null;
+	}
+	
+	@Override
+	public Long getHostTokenForKey(String key) {
+		throw new RuntimeException("Not Implemented");
+	}
+
+	@Override
+	public boolean isPoolActiveForToken(Long token) {
+		throw new RuntimeException("Not Implemented");
 	}
 	
 	public String toString() {

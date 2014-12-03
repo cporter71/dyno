@@ -53,7 +53,7 @@ public class DynoJedisClient implements JedisCommands, MultiKeyCommands {
 	
 	private enum OpName {
 		 APPEND, BITCOUNT, BLPOP, BRPOP, DECR, DECRBY, DEL, DUMP, ECHO, EXISTS, EXPIRE, EXPIREAT, GET, GETBIT, GETRANGE, GETSET, 
-		 HDEL, HEXISTS,  HGET, HGETALL, HINCRBY, HINCRBYFLOAT, HKEYS, HLEN, HMGET, HMSET, HSET, HSETNX, HVALS, 
+		 FLUSHALL, HDEL, HEXISTS,  HGET, HGETALL, HINCRBY, HINCRBYFLOAT, HKEYS, HLEN, HMGET, HMSET, HSET, HSETNX, HVALS, 
 		 INCR, INCRBY, INCRBYFLOAT, KEYS, LINDEX, LINSERT, LLEN, LPOP, LPUSH, LPUSHX, LRANGE, LREM, LSET, LTRIM, 
 		 MOVE, PERSIST, PEXPIRE, PEXPIREAT, PSETEX, PTTL, RESTORE, RPOP, RPOPLPUSH, RPUSH, RPUSHX, 
 		 SADD, SCARD, SDIFF, SDIFFSTORE, SET, SETBIT, SETEX, SETNX, SETRANGE, SINTER, SINTERSTORE, SISMEMBER, SMEMBERS, 
@@ -217,6 +217,21 @@ public class DynoJedisClient implements JedisCommands, MultiKeyCommands {
 		});
 	}
 
+	public void flushall() {
+		d_flushall();
+	}
+
+	public void d_flushall() {
+
+		connPool.executeWithRing(new BaseKeyOperation<Void>(null, OpName.FLUSHALL) {
+			@Override
+			public Void execute(Jedis client, ConnectionContext state) {
+				client.flushAll();
+				return null;
+			}
+		});
+	}
+	
 	@Override
 	public String get(final String key)  {
 		return d_get(key).getResult();

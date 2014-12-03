@@ -157,6 +157,10 @@ public class ConnectionPoolHealthTracker<CL> {
 		stop.set(true);
 	}
 	
+	public void clearConnectionError(Host host) {
+		errorRates.remove(host);
+	}
+	
 	public void trackConnectionError(HostConnectionPool<CL> hostPool, DynoException e) {
 			
 		if (e != null && e instanceof TimeoutException) {

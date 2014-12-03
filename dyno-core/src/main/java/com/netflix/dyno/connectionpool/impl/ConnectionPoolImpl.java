@@ -315,6 +315,7 @@ public class ConnectionPoolImpl<CL> implements ConnectionPool<CL> {
 				
 				retry.success();
 				cpMonitor.incOperationSuccess(connection.getHost(), System.currentTimeMillis()-startTime);
+				cpHealthTracker.clearConnectionError(connection.getHost());
 				
 				return result; 
 				

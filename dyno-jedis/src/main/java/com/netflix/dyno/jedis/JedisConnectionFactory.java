@@ -1,5 +1,6 @@
 package com.netflix.dyno.jedis;
 
+import java.net.SocketException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.NotImplementedException;
@@ -72,19 +73,33 @@ public class JedisConnectionFactory implements ConnectionFactory<Jedis> {
 			OperationResultImpl<R> opResult = null;
 			
 			try { 
+				
+				if (!jedisClient.isConnected()) {
+					open();
+				}
+				
 				R result = op.execute(jedisClient, null);
 				opMonitor.recordSuccess(opName);
 				opResult = new OperationResultImpl<R>(opName, result, opMonitor);
 				return opResult;
 				
 			} catch (JedisConnectionException ex) {
+				
 				opMonitor.recordFailure(opName, ex.getMessage());
+				if (ex.getCause() instanceof SocketException) {
+					SocketException se = (SocketException) ex.getCause();
+					if (se.getMessage().equalsIgnoreCase("broken pipe")) {
+						close();
+					}
+				}
+				
 				lastDynoException = (DynoConnectException) new FatalConnectionException(ex).setAttempt(1);
 				throw lastDynoException;
 
 			} catch (RuntimeException ex) {
 				opMonitor.recordFailure(opName, ex.getMessage());
 				lastDynoException = (DynoConnectException) new FatalConnectionException(ex).setAttempt(1);
+				lastDynoException.setHost(hostPool.getHost());
 				throw lastDynoException;
 				
 			} finally {
@@ -102,8 +117,16 @@ public class JedisConnectionFactory implements ConnectionFactory<Jedis> {
 
 		@Override
 		public void close() {
-			jedisClient.quit();
-			jedisClient.disconnect();
+			if (jedisClient != null) {
+				try {
+					jedisClient.quit();
+				} catch (Exception e) {
+				}
+				try {
+					jedisClient.disconnect();
+				} catch (Exception e) {
+				}
+			}
 		}
 
 		@Override

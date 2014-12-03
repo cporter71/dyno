@@ -566,10 +566,12 @@ public class DynoJedisClient implements JedisCommands, MultiKeyCommands {
 
 	public Collection<OperationResult<String>> d_info() {
 
-		return connPool.executeWithRing(new BaseKeyOperation<String>(null, OpName.FLUSHALL) {
+		return connPool.executeWithRing(new BaseKeyOperation<String>(null, OpName.INFO) {
 			@Override
 			public String execute(Jedis client, ConnectionContext state) {
-				return client.info();
+				String hostDetails = new StringBuilder().append("# Host").append("\nhost:").append(client.getClient().getHost()).append("\nport:")
+						.append(client.getClient().getPort()).append("\n").toString();
+				return hostDetails + client.info();
 			}
 		});
 	}

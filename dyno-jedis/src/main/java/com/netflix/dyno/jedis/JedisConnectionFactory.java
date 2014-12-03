@@ -94,6 +94,7 @@ public class JedisConnectionFactory implements ConnectionFactory<Jedis> {
 				}
 				
 				lastDynoException = (DynoConnectException) new FatalConnectionException(ex).setAttempt(1);
+				lastDynoException.setHost(hostPool.getHost());
 				throw lastDynoException;
 
 			} catch (RuntimeException ex) {

@@ -1,5 +1,6 @@
 package com.netflix.dyno.jedis;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -54,7 +55,7 @@ public class DynoJedisClient implements JedisCommands, MultiKeyCommands {
 	private enum OpName {
 		 APPEND, BITCOUNT, BLPOP, BRPOP, DECR, DECRBY, DEL, DUMP, ECHO, EXISTS, EXPIRE, EXPIREAT, GET, GETBIT, GETRANGE, GETSET, 
 		 FLUSHALL, HDEL, HEXISTS,  HGET, HGETALL, HINCRBY, HINCRBYFLOAT, HKEYS, HLEN, HMGET, HMSET, HSET, HSETNX, HVALS, 
-		 INCR, INCRBY, INCRBYFLOAT, KEYS, LINDEX, LINSERT, LLEN, LPOP, LPUSH, LPUSHX, LRANGE, LREM, LSET, LTRIM, 
+		 INCR, INCRBY, INCRBYFLOAT, INFO, KEYS, LINDEX, LINSERT, LLEN, LPOP, LPUSH, LPUSHX, LRANGE, LREM, LSET, LTRIM, 
 		 MOVE, PERSIST, PEXPIRE, PEXPIREAT, PSETEX, PTTL, RESTORE, RPOP, RPOPLPUSH, RPUSH, RPUSHX, 
 		 SADD, SCARD, SDIFF, SDIFFSTORE, SET, SETBIT, SETEX, SETNX, SETRANGE, SINTER, SINTERSTORE, SISMEMBER, SMEMBERS, 
 		 SMOVE, SORT, SPOP, SRANDMEMBER, SREM, STRLEN, SUBSTR, SUNION, SUNIONSTORE, TTL, TYPE, 
@@ -554,6 +555,25 @@ public class DynoJedisClient implements JedisCommands, MultiKeyCommands {
 		});
 	}	
 
+	public Collection<String> info() {
+		List<String> allResults = new ArrayList<String>();
+		Collection<OperationResult<String>> results = d_info();
+		for (OperationResult<String> result : results) {
+			allResults.add(result.getResult());
+		}
+		return allResults;
+	}
+
+	public Collection<OperationResult<String>> d_info() {
+
+		return connPool.executeWithRing(new BaseKeyOperation<String>(null, OpName.FLUSHALL) {
+			@Override
+			public String execute(Jedis client, ConnectionContext state) {
+				return client.info();
+			}
+		});
+	}
+	
 	@Override
 	public String lindex(final String key, final long index)  {
 	    return d_lindex(key, index).getResult();

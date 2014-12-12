@@ -236,9 +236,10 @@ public class ConnectionPoolHealthTracker<CL> {
 		if (hostPool.getType() == Type.Sync) {
 			Connection<CL> connection = null;
 			try {
-				connection = hostPool.borrowConnection(100, TimeUnit.MILLISECONDS);
-				connection.execPing();
-
+				connection = hostPool.borrowConnection(50, TimeUnit.MILLISECONDS);
+				if (connection != null) {
+					connection.execPing();
+				}
 			} catch (Exception e) {
 
 				DynoException de;

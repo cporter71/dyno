@@ -88,7 +88,7 @@ public class JedisConnectionFactory implements ConnectionFactory<Jedis> {
 				opMonitor.recordFailure(opName, ex.getMessage());
 				if (ex.getCause() instanceof SocketException) {
 					SocketException se = (SocketException) ex.getCause();
-					if (se.getMessage().equalsIgnoreCase("broken pipe")) {
+					if (!se.getMessage().equalsIgnoreCase("timeout")) {
 						close();
 					}
 				}

@@ -33,6 +33,7 @@ import com.netflix.dyno.connectionpool.exception.DynoConnectException;
 import com.netflix.dyno.connectionpool.exception.DynoException;
 import com.netflix.dyno.connectionpool.exception.FatalConnectionException;
 import com.netflix.dyno.connectionpool.exception.ThrottledException;
+import com.netflix.dyno.connectionpool.impl.ConnectionPoolImpl.HostConnectionPoolFactory.Type;
 import com.netflix.dyno.connectionpool.impl.lb.CircularList;
 
 public class SimpleAsyncConnectionPoolImpl<CL> implements HostConnectionPool<CL> {
@@ -59,6 +60,11 @@ public class SimpleAsyncConnectionPoolImpl<CL> implements HostConnectionPool<CL>
 		this.connFactory = cFactory;
 		this.cpConfig = config;
 		this.cpMonitor = monitor;
+	}
+	
+	@Override
+	public Type getType() {
+		return Type.Async;
 	}
 	
 	@Override

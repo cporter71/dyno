@@ -23,6 +23,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.SocketException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -44,10 +45,12 @@ import com.netflix.dyno.connectionpool.ConnectionPoolConfiguration;
 import com.netflix.dyno.connectionpool.Host;
 import com.netflix.dyno.connectionpool.Host.Status;
 import com.netflix.dyno.connectionpool.HostConnectionPool;
+import com.netflix.dyno.connectionpool.exception.DynoConnectException;
 import com.netflix.dyno.connectionpool.exception.DynoException;
 import com.netflix.dyno.connectionpool.exception.FatalConnectionException;
 import com.netflix.dyno.connectionpool.exception.TimeoutException;
 import com.netflix.dyno.connectionpool.impl.ConnectionPoolConfigurationImpl;
+import com.netflix.dyno.connectionpool.impl.ConnectionPoolImpl.HostConnectionPoolFactory.Type;
 
 /**
  * This class tracks the error rates for any {@link HostConnectionPool} via the {@link ErrorRateMonitor}
@@ -139,6 +142,7 @@ public class ConnectionPoolHealthTracker<CL> {
 							if (pool.isActive()) {
 								Logger.info("Host pool reactivated: " + host);
 								reconnectingPools.remove(host);
+								pingingPools.put(host, pool);
 							} else {
 								Logger.info("Could not re-activate pool, will try again later");
 							}
@@ -228,15 +232,47 @@ public class ConnectionPoolHealthTracker<CL> {
 	}
 
 	private void pingHostPool(HostConnectionPool<CL> hostPool) {
-		for (Connection<CL> connection : hostPool.getAllConnections()) {
-			try { 
+
+		if (hostPool.getType() == Type.Sync) {
+			Connection<CL> connection = null;
+			try {
+				connection = hostPool.borrowConnection(100, TimeUnit.MILLISECONDS);
 				connection.execPing();
-			} catch (DynoException e) {
-				trackConnectionError(hostPool, e);
+
+			} catch (Exception e) {
+
+				DynoException de;
+				if (e.getCause() != null && e.getCause() instanceof SocketException) {
+					SocketException se = (SocketException) e.getCause();
+					if (!se.getMessage().equalsIgnoreCase("timeout")) {
+						connection.close();
+					}
+					de = new FatalConnectionException(se).setAttempt(1);
+				} else if (e.getMessage() != null && e.getMessage().contains("server has closed the connection")) {
+					connection.close();
+					de = new FatalConnectionException(e).setAttempt(1);
+				} else if (e instanceof DynoException) {
+					de = (DynoException) e;
+				} else {
+					de = new DynoException(e);
+				}
+				trackConnectionError(hostPool, de);
+			} finally {
+				if (connection != null) {
+					connection.getContext().reset();
+					connection.getParentConnectionPool().returnConnection(connection);
+				}
+			}
+		} else { // Type.Async
+			for (Connection<CL> connection : hostPool.getAllConnections()) {
+				try {
+					connection.execPing();
+				} catch (DynoException e) {
+					trackConnectionError(hostPool, e);
+				}
 			}
 		}
 	}
-
 	
 	public static class UnitTest {
 	

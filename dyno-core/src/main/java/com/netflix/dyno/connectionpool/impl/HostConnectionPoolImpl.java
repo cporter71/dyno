@@ -56,6 +56,7 @@ import com.netflix.dyno.connectionpool.exception.FatalConnectionException;
 import com.netflix.dyno.connectionpool.exception.PoolOfflineException;
 import com.netflix.dyno.connectionpool.exception.PoolTimeoutException;
 import com.netflix.dyno.connectionpool.exception.ThrottledException;
+import com.netflix.dyno.connectionpool.impl.ConnectionPoolImpl.HostConnectionPoolFactory.Type;
 
 /**
  * Main impl for {@link HostConnectionPool}
@@ -108,6 +109,11 @@ public class HostConnectionPoolImpl<CL> implements HostConnectionPool<CL> {
 		this.connFactory = conFactory;
 		this.cpConfig = cpConfig;
 		this.monitor = poolMonitor;
+	}
+	
+	@Override
+	public Type getType() {
+		return Type.Sync;
 	}
 	
 	public ConnectionPoolConfiguration getConnectionPoolConfiguration() {

@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import com.netflix.dyno.connectionpool.exception.DynoException;
+import com.netflix.dyno.connectionpool.impl.ConnectionPoolImpl.HostConnectionPoolFactory.Type;
 
 /**
  * Interface for a pool of {@link Connection}(s) for a single {@link Host}
@@ -51,6 +52,13 @@ import com.netflix.dyno.connectionpool.exception.DynoException;
  * @param <CL>
  */
 public interface HostConnectionPool<CL> {
+
+	/**
+	 * The {@link Type} of pool.
+	 * 
+	 * @return
+	 */
+	public Type getType();
 	
 	/**
 	 * Pool configuration.

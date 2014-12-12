@@ -193,11 +193,11 @@ public class ConnectionPoolImpl<CL> implements ConnectionPool<CL> {
 					selectionStrategy.addHost(host, hostPool);
 				}
 				
-				// Initiate ping based monitoring only for async pools.
-				// Note that sync pools get monitored based on feedback from operation executions on the pool itself
-				if (poolType == Type.Async) {
-					cpHealthTracker.initialPingHealthchecksForPool(hostPool);
-				}
+				// Initiate ping based monitoring only for async pools (all
+				// connections). For sync pool monitor the host via a single
+				// ping. This is useful for failover hosts that do not take
+				// regular traffic. 
+				cpHealthTracker.initialPingHealthchecksForPool(hostPool);
 				
 				cpMonitor.hostAdded(host, hostPool);
 				

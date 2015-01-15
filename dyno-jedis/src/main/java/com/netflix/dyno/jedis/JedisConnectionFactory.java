@@ -58,10 +58,9 @@ public class JedisConnectionFactory implements ConnectionFactory<Jedis> {
 
 			jedisClient = new Jedis(host.getHostName(), host.getPort(), connectTimeout, socketTimeout);
 
-			// // TODO: Dynomite node should support AUTH
-			// if (host.isPasswordSet()) {
-			// jedisClient.auth(host.getPassword());
-			// }
+			if (host.isPasswordSet()) {
+				jedisClient.auth(host.getPassword());
+			}
 		}
 		
 		@Override

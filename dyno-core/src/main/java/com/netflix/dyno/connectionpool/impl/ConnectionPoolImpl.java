@@ -123,8 +123,6 @@ public class ConnectionPoolImpl<CL> implements ConnectionPool<CL> {
 	
 	private HostSelectionWithFallback<CL> selectionStrategy; 
 	
-	private Type poolType;
-
 	public ConnectionPoolImpl(ConnectionFactory<CL> cFactory, ConnectionPoolConfiguration cpConfig, ConnectionPoolMonitor cpMon) {
 		this(cFactory, cpConfig, cpMon, Type.Sync);
 	}
@@ -133,7 +131,6 @@ public class ConnectionPoolImpl<CL> implements ConnectionPool<CL> {
 		this.connFactory = cFactory;
 		this.cpConfiguration = cpConfig;
 		this.cpMonitor = cpMon;
-		this.poolType = type; 
 		
 		this.cpHealthTracker = new ConnectionPoolHealthTracker<CL>(cpConfiguration, connPoolThreadPool);
 

@@ -1,12 +1,13 @@
 package com.netflix.dyno.jedis;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.slf4j.Logger;
@@ -23,8 +24,11 @@ import redis.clients.jedis.Tuple;
 import redis.clients.jedis.ZParams;
 
 import com.netflix.discovery.DiscoveryClient;
+import com.netflix.dyno.connectionpool.Connection;
 import com.netflix.dyno.connectionpool.ConnectionContext;
 import com.netflix.dyno.connectionpool.ConnectionPool;
+import com.netflix.dyno.connectionpool.Host;
+import com.netflix.dyno.connectionpool.HostConnectionPool;
 import com.netflix.dyno.connectionpool.HostSupplier;
 import com.netflix.dyno.connectionpool.Operation;
 import com.netflix.dyno.connectionpool.OperationResult;
@@ -555,25 +559,54 @@ public class DynoJedisClient implements JedisCommands, MultiKeyCommands {
 		});
 	}	
 
-	public Collection<String> info() {
-		List<String> allResults = new ArrayList<String>();
-		Collection<OperationResult<String>> results = d_info();
-		for (OperationResult<String> result : results) {
-			allResults.add(result.getResult());
-		}
-		return allResults;
-	}
+	/**
+	 * Execute INFO command against hosts provided from {@link HostSupplier}.
+	 * 
+	 * @return Map keyed by the {@link Host}s supplied from the current state of
+	 *         the {@link HostSupplier}. The response will contain a value for
+	 *         all {@link Host} keys however if a {@link Host} is determined to
+	 *         not be up then a NULL value will be
+	 */
+	public Map<Host, String> info() {
 
-	public Collection<OperationResult<String>> d_info() {
+		HashMap<Host, String> infoMap = new HashMap<Host, String>();
 
-		return connPool.executeWithRing(new BaseKeyOperation<String>(null, OpName.INFO) {
-			@Override
-			public String execute(Jedis client, ConnectionContext state) {
-				String hostDetails = new StringBuilder().append("# Host").append("\nhost:").append(client.getClient().getHost()).append("\nport:")
-						.append(client.getClient().getPort()).append("\n").toString();
-				return hostDetails + client.info();
+		Collection<Host> hosts = connPool.getHostSupplier().getHosts();
+		for (Host h : hosts) {
+
+			/*
+			 * Each host should have an entry even if the value remains null.
+			 */
+			infoMap.put(h, null);
+
+			if (connPool.isHostUp(h)) {
+
+				HostConnectionPool<Jedis> hostPool = null;
+				Connection<Jedis> connection = null;
+
+				try {
+					hostPool = connPool.getHostPool(h);
+					connection = hostPool.borrowConnection(hostPool.getConnectionPoolConfiguration().getMaxTimeoutWhenExhausted(), TimeUnit.MILLISECONDS);
+					OperationResult<String> result = connection.execute(new BaseKeyOperation<String>(null, OpName.INFO) {
+						@Override
+						public String execute(Jedis client, ConnectionContext state) {
+							String hostDetails = new StringBuilder().append("# Host").append("\nhost:").append(client.getClient().getHost()).append("\nport:")
+									.append(client.getClient().getPort()).append("\n").toString();
+							return hostDetails + client.info();
+						}
+					});
+					infoMap.put(h, result.getResult());
+				} catch (DynoException e) {
+					e.printStackTrace();
+				} finally {
+					if (hostPool != null && connection != null) {
+						hostPool.returnConnection(connection);
+					}
+				}
 			}
-		});
+		}
+
+		return infoMap;
 	}
 	
 	@Override
